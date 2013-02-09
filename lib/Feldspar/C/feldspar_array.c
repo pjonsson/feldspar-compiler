@@ -33,28 +33,26 @@
 //#define LOG
 #include "log.h"
 
-unsigned int feldspar_array_linker_hook = 0xDECAFBAD;
-
 /* Deep array copy with a given length */
-void copyArrayLen(struct array *to, struct array *from, int32_t len)
+void copyArrayLen(void *to_in, void *from_in, int32_t len)
 {
+    int32_t *to = (int32_t *)to_in;
+    int32_t *from = (int32_t *)from_in;
     assert(to);
     assert(from);
     log_3("copyArrayLen %p %p %d - enter\n", to, from, len);
-    if( from->elemSize < 0 )
+    if( from[ELEM_SIZE] < 0 )
     {
         unsigned i;
         log_3("copyArrayLen %p %p %d - nested\n", to, from, len);
         for( i = 0; i < len; ++i )
-            copyArray( &at(struct array, to, i), &at(struct array, from, i) );
+            copyArray( &at(to, i), &at(from, i) );
     }
     else
     {
-        assert(to->buffer);
-        assert(from->buffer);
         log_4("copyArrayLen %p %p %d - memcpy %d bytes\n", to, from, len
-            , len*from->elemSize);
-        memcpy( to->buffer, from->buffer, len * from->elemSize );
+	      , len*from[ELEM_SIZE] );
+        memcpy( to, from, len * from[ELEM_SIZE] );
     }
     log_3("copyArrayLen %p %p %d - leave\n", to, from, len);
 }

@@ -146,8 +146,7 @@ instance CodeGen (Expression ())
   where
     cgen env VarExpr{..} = cgen env var
     cgen env e@ArrayElem{..}  =  text "at"
-                             <> parens (hcat $ punctuate comma [ cgen env $ typeof e
-                                                               , cgen env array
+                             <> parens (hcat $ punctuate comma [ cgen env array
                                                                , cgen env arrayIndex
                                                                ])
     cgen env e@NativeElem{..} = cgen env array <> brackets (cgen env arrayIndex)
@@ -201,7 +200,7 @@ instance CodeGen Type
     cgen env = toC
       where
         toC VoidType                   = text "void"
-        toC ArrayType{}                = text "struct array"
+        toC (ArrayType _ t)            = toC t
         toC IVarType{}                 = text "struct ivar"
         toC (UserType u)               = text u
         toC (StructType n _)           = text "struct" <+> text n
