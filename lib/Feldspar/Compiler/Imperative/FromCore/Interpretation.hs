@@ -279,6 +279,7 @@ compileTypeRep (RefType a) _            = compileTypeRep a (defaultSize a)
 compileTypeRep (Core.ArrayType a) (rs :> es) = ArrayType rs $ compileTypeRep a es
 compileTypeRep (MArrType a) (rs :> es)  = ArrayType rs $ compileTypeRep a es
 compileTypeRep (ParType a) _            = compileTypeRep a (defaultSize a)
+compileTypeRep (Core.ParForType a) (rs :> es)= ArrayType rs $ compileTypeRep a (defaultSize a)
 compileTypeRep (Core.IVarType a) _      = IVarType $ compileTypeRep a $ defaultSize a
 compileTypeRep (FunType _ b) (_, sz)    = compileTypeRep b sz
 compileTypeRep (FValType a) sz          = IVarType $ compileTypeRep a sz
