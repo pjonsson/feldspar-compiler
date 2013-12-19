@@ -4,7 +4,9 @@ cabal-version:  >= 1.14
 build-type:     Simple
 license:        BSD3
 license-file:   LICENSE
-copyright:      Copyright (c) 2012 Emil Axelsson, Gergely Dévai,
+copyright:      Copyright (c) 2013 Emil Axelsson, Peter Jonsson,
+                                   Anders Persson, Josef Svenningsson
+                Copyright (c) 2012 Emil Axelsson, Gergely Dévai,
                                    Anders Persson, Josef Svenningsson
                 Copyright (c) 2009-2011, ERICSSON AB
 author:         Feldspar group,
@@ -75,7 +77,7 @@ library
 
   build-depends:
     base              == 4.*,
-    syntactic         >= 1.6   && < 1.9,
+    syntactic         >= 1.6   && < 1.10,
     feldspar-language >= 0.6.1 && < 0.7,
     mtl,
     pretty,
@@ -163,8 +165,8 @@ test-suite regression
     base,
     process,
     bytestring       >= 0.9 && < 0.11,
-    tasty            >= 0.3 && < 0.4,
-    tasty-golden     >= 2.0 && < 2.1,
-    tasty-quickcheck >= 0.3 && < 0.4,
+    tasty            >= 0.3 && < 0.5,
+    tasty-golden     >= 2.0 && < 3,
+    tasty-quickcheck >= 0.3 && < 0.5,
     QuickCheck       >= 2.5 && < 3.0
 
