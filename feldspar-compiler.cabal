@@ -49,6 +49,7 @@ library
     Feldspar.Compiler.Imperative.FromCore.MutableToPure
     Feldspar.Compiler.Imperative.FromCore.NoInline
     Feldspar.Compiler.Imperative.FromCore.Par
+    Feldspar.Compiler.Imperative.FromCore.ParFor
     Feldspar.Compiler.Imperative.FromCore.Primitive
     Feldspar.Compiler.Imperative.FromCore.SizeProp
     Feldspar.Compiler.Imperative.FromCore.SourceInfo
