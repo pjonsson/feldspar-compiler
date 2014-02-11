@@ -28,13 +28,14 @@
 
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Feldspar.Compiler.Imperative.FromCore.ParFor where
 
-import Control.Monad.RWS (ask)
+import Data.Typeable
 
 import Language.Syntactic
 import Language.Syntactic.Constructs.Monad
@@ -58,7 +59,10 @@ instance ( Compile dom dom
          , Project (CLambda Type) dom
          , Project (Variable :|| Type) dom
          , Project (Literal :|| Type) dom
+         , Project Let dom
          , Project (ParForFeat :|| Type) dom
+         , ConstrainedBy dom Typeable
+         , AlphaEq dom dom (Decor Info dom) [(VarId, VarId)]
          )
       => Compile (ParForFeat :|| Type) dom
   where
@@ -81,6 +85,26 @@ instance ( Compile dom dom
             step' <- withAlias v1 ix $ compileExpr step
             (_, ixf') <- confiscateBlock $ compileProg loc ixf
             tellProg [for True (lName ix) len' step' ixf']
+
+    compileProgSym (C' PParRed) info (Just loc) (len :* st0 :* (lam1 :$ lt1) :* Nil)
+      | Just (SubConstr2 (Lambda v1)) <- prjLambda lam1
+      , (bs1, lam2 :$ ixf)             <- collectLetBinders lt1
+      , Just (SubConstr2 (Lambda s)) <- prjLambda lam2
+      = do
+          let ta = argType $ infoType $ getInfo lam1
+              sa = fst $ infoSize $ getInfo lam1
+              ix = mkVar (compileTypeRep ta sa) v1
+              tst = infoType $ getInfo ixf
+              sst = infoSize $ getInfo ixf
+          len' <- mkLength len (infoType $ getInfo len) sa
+          st1 <- freshVar "st" tst sst
+          let st = mkRef (compileTypeRep tst sst) s
+          declareAlias st
+          compileProg (Just st1) st0
+          (_, Block bs ixf') <- confiscateBlock $ withAlias s st $ compileProg (Just $ ArrayElem loc ix) ixf
+          tellProg [ Assign st st1
+                   , for False (lName ix) len' (litI32 1) $
+                       Block bs (Sequence [ixf', Assign st (ArrayElem loc ix)])]
 
     compileProgSym (C' PParPut) _ (Just loc) (ix :* e :* Nil) = do
       dst <- compileExpr ix
